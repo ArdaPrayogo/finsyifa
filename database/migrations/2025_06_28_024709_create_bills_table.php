@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('bills', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('student_id')->constrained()->onDelete('cascade');
+            $table->foreignId('bill_type_id')->nullable()->constrained('bill_types')->nullOnDelete();
+            $table->decimal('amount', 10, 2)->nullable(); // bisa dikosongkan dulu
+            $table->date('due_date')->nullable();
+            $table->enum('status', ['unpaid', 'partial', 'paid'])->default('unpaid');
             $table->timestamps();
         });
     }

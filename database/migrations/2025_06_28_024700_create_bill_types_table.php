@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('bill_types', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->decimal('default_amount', 10, 2)->nullable(); // bisa diisi atau dikosongkan
+            $table->boolean('is_monthly')->default(false);
             $table->timestamps();
         });
     }
