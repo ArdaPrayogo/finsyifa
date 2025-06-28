@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bill;
 use App\Models\bills;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,9 @@ class BillsController extends Controller
      */
     public function index()
     {
-        //
+
+        $bills = Bill::with(['student', 'billType'])->get();
+        return view('bills.index', compact('bills'));
     }
 
     /**
@@ -34,7 +37,7 @@ class BillsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(bills $bills)
+    public function show(Bill $bill)
     {
         //
     }
@@ -42,7 +45,7 @@ class BillsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(bills $bills)
+    public function edit(Bill $bill)
     {
         //
     }
@@ -50,7 +53,7 @@ class BillsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, bills $bills)
+    public function update(Request $request, Bill $bill)
     {
         //
     }
@@ -58,7 +61,7 @@ class BillsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(bills $bills)
+    public function destroy(Bill $bill)
     {
         //
     }

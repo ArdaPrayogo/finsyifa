@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bill;
+use App\Models\Bill_type;
 use App\Models\bill_types;
 use Illuminate\Http\Request;
 
@@ -12,7 +14,8 @@ class BillTypesController extends Controller
      */
     public function index()
     {
-        //
+        $billTypes = Bill_type::all();
+        return view('bill_types.index', compact('billTypes'));
     }
 
     /**
@@ -34,7 +37,7 @@ class BillTypesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(bill_types $bill_types)
+    public function show(Bill_type $bill_type)
     {
         //
     }
@@ -42,7 +45,7 @@ class BillTypesController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(bill_types $bill_types)
+    public function edit(Bill_type $bill_type)
     {
         //
     }
@@ -50,7 +53,7 @@ class BillTypesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, bill_types $bill_types)
+    public function update(Request $request, Bill_type $bill_type)
     {
         //
     }
@@ -58,7 +61,7 @@ class BillTypesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(bill_types $bill_types)
+    public function destroy(Bill_type $bill_type)
     {
         //
     }

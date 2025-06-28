@@ -12,7 +12,7 @@
                         href="/">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('siswa', 'riwayat*') ? 'active' : '' }}" href="/siswa">Siswa</a>
+                    <a class="nav-link {{ Request::is('siswa') ? 'active' : '' }}" href="/siswa">Siswa</a>
                 </li>
 
                 <li class="nav-item">

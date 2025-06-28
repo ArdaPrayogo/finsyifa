@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Student;
 use App\Models\students;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,9 @@ class StudentsController extends Controller
      */
     public function index()
     {
-        //
+        return view('students/index', [
+            "students" => Student::get()
+        ]);
     }
 
     /**
@@ -34,7 +37,7 @@ class StudentsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(students $students)
+    public function show(Student $student)
     {
         //
     }
@@ -42,7 +45,7 @@ class StudentsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(students $students)
+    public function edit(Student $student)
     {
         //
     }
@@ -50,7 +53,7 @@ class StudentsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, students $students)
+    public function update(Request $request, Student $student)
     {
         //
     }
@@ -58,7 +61,7 @@ class StudentsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(students $students)
+    public function destroy(Student $student)
     {
         //
     }
