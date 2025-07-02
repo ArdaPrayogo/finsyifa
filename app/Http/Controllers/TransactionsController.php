@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bill;
+use App\Models\Student;
 use App\Models\Transaction;
 use App\Models\transactions;
 use Illuminate\Http\Request;
@@ -23,46 +25,78 @@ class TransactionsController extends Controller
      */
     public function create()
     {
-        //
+        $students = Student::all();
+        $bills = Bill::with('student', 'billType')->get(); // relasi ke siswa & jenis tagihan
+        return view('transactions.create', compact('students', 'bills'));
     }
+
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'bill_id' => 'required|exists:bills,id',
+            'amount_paid' => 'required|numeric|min:1',
+            'payment_date' => 'required|date',
+            'note' => 'nullable|string',
+        ]);
+
+        Transaction::create($validated);
+
+        return redirect('/transaksi')->with('success', 'Transaksi berhasil ditambahkan.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Transaction $transaction)
+    public function show($id)
     {
-        //
+        $transaction = Transaction::with('student')->findOrFail($id);
+        return view('transactions.show', compact('transaction'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Transaction $transaction)
+    public function edit($id)
     {
-        //
+        $transaction = Transaction::findOrFail($id);
+        $students = Student::all();
+        return view('transactions.edit', compact('transaction', 'students'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Transaction $transaction)
+    public function update(Request $request, $id)
     {
-        //
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'bill_id' => 'required|exists:bills,id',
+            'amount_paid' => 'required|numeric|min:1',
+            'payment_date' => 'required|date',
+            'note' => 'nullable|string',
+        ]);
+
+        $transaction = Transaction::findOrFail($id);
+        $transaction->update($validated);
+
+        return redirect('/transaksi')->with('success', 'Transaksi berhasil diperbarui.');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transaction $transaction)
+    public function destroy($id)
     {
-        //
+        $transaction = Transaction::findOrFail($id);
+        $transaction->delete();
+        return redirect('/transaksi')->with('success', 'Transaksi berhasil dihapus.');
     }
 }

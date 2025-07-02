@@ -12,18 +12,18 @@
                         href="/">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('siswa') ? 'active' : '' }}" href="/siswa">Siswa</a>
+                    <a class="nav-link {{ Request::is('siswa*') ? 'active' : '' }}" href="/siswa">Siswa</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('daftar_tagihan') ? 'active' : '' }}"
+                    <a class="nav-link {{ Request::is('daftar_tagihan*') ? 'active' : '' }}"
                         href="/daftar_tagihan">Daftar Tagihan</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('tagihan') ? 'active' : '' }}" href="/tagihan">tagihan</a>
+                    <a class="nav-link {{ Request::is('tagihan*') ? 'active' : '' }}" href="/tagihan">Tagihan</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('transaksi') ? 'active' : '' }}" href="/transaksi">transaksi</a>
+                    <a class="nav-link {{ Request::is('transaksi*') ? 'active' : '' }}" href="/transaksi">Transaksi</a>
                 </li>
             </ul>
             <ul class="navbar-nav ms-auto">

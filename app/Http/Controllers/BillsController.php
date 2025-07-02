@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bill;
+use App\Models\Bill_type;
 use App\Models\bills;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 class BillsController extends Controller
@@ -18,51 +20,66 @@ class BillsController extends Controller
         return view('bills.index', compact('bills'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function show($id)
+    {
+        $bill = \App\Models\Bill::with(['student', 'billType'])->findOrFail($id);
+        return view('bills.show', compact('bill'));
+    }
+
+
     public function create()
     {
-        //
+        return view('bills.create', [
+            'students' => Student::all(),
+            'billTypes' => Bill_type::all(),
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'student_id'   => 'required|exists:students,id',
+            'bill_type_id' => 'required|exists:bill_types,id',
+            'amount'       => 'required|numeric|min:0',
+            'due_date'     => 'required|date',
+            'status'       => 'required|in:unpaid,partial,paid',
+        ]);
+
+        Bill::create($validated);
+        return redirect('/tagihan')->with('success', 'Tagihan berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Bill $bill)
+    public function edit($id)
     {
-        //
+        $bill = Bill::findOrFail($id);
+        return view('bills.edit', [
+            'bill' => $bill,
+            'students' => Student::all(),
+            'billTypes' => Bill_type::all(),
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Bill $bill)
+    public function update(Request $request, $id)
     {
-        //
+        $validated = $request->validate([
+            'student_id'   => 'required|exists:students,id',
+            'bill_type_id' => 'required|exists:bill_types,id',
+            'amount'       => 'required|numeric|min:0',
+            'due_date'     => 'required|date',
+            'status'       => 'required|in:unpaid,partial,paid',
+        ]);
+
+        $bill = Bill::findOrFail($id);
+        $bill->update($validated);
+
+        return redirect('/tagihan')->with('success', 'Tagihan berhasil diperbarui.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Bill $bill)
+    public function destroy($id)
     {
-        //
-    }
+        $bill = Bill::findOrFail($id);
+        $bill->delete();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Bill $bill)
-    {
-        //
+        return redirect('/tagihan')->with('deleted', 'Tagihan berhasil dihapus.');
     }
 }

@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Bill;
 use App\Models\Bill_type;
-use App\Models\bill_types;
 use Illuminate\Http\Request;
 
 class BillTypesController extends Controller
@@ -17,52 +15,59 @@ class BillTypesController extends Controller
         $billTypes = Bill_type::all();
         return view('bill_types.index', compact('billTypes'));
     }
+    public function show($id)
+    {
+        $billType = Bill_type::findOrFail($id);
 
-    /**
-     * Show the form for creating a new resource.
-     */
+        // Jika ingin menampilkan tagihan yang memakai jenis ini:
+        $bills = \App\Models\Bill::with('student')
+            ->where('bill_type_id', $billType->id)
+            ->get();
+
+        return view('bill_types.show', compact('billType', 'bills'));
+    }
+
     public function create()
     {
-        //
+        return view('bill_types.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'default_amount' => 'nullable|numeric|min:0',
+            'is_monthly' => 'required|boolean',
+        ]);
+
+        Bill_type::create($validated);
+        return redirect('/daftar_tagihan')->with('success', 'Jenis tagihan berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Bill_type $bill_type)
+    public function edit($id)
     {
-        //
+        $billType = Bill_type::findOrFail($id);
+        return view('bill_types.edit', compact('billType'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Bill_type $bill_type)
+    public function update(Request $request, $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'default_amount' => 'nullable|numeric|min:0',
+            'is_monthly' => 'required|boolean',
+        ]);
+
+        $billType = Bill_type::findOrFail($id);
+        $billType->update($validated);
+
+        return redirect('/daftar_tagihan')->with('success', 'Jenis tagihan berhasil diperbarui.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Bill_type $bill_type)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Bill_type $bill_type)
-    {
-        //
+        $billType = Bill_type::findOrFail($id);
+        $billType->delete();
+        return redirect('/daftar_tagihan')->with('deleted', 'Jenis tagihan berhasil dihapus.');
     }
 }
