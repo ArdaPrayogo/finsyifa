@@ -1,6 +1,17 @@
 @extends('layouts.main')
 @section('container')
-    <h2 class="mb-3">Detail Transaksi</h2>
+    <div class="d-flex justify-content-between">
+
+        <h2 class="mb-3">Detail Transaksi</h2>
+        <div>
+            <a href="{{ route('transaksi.nota', $transaction->id) }}" class="btn btn-outline-secondary" target="_blank">Lihat
+                Nota</a>
+            <a href="{{ route('transaksi.nota.pdf', $transaction->id) }}" class="btn btn-outline-primary"
+                target="_blank">Download
+                PDF</a>
+        </div>
+
+    </div>
 
     <div class="card">
         <div class="card-body">

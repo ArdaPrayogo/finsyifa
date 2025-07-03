@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Models\Transaction;
 use App\Models\transactions;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransactionsController extends Controller
 {
@@ -121,5 +122,19 @@ class TransactionsController extends Controller
         $transaction = Transaction::findOrFail($id);
         $transaction->delete();
         return redirect('/transaksi')->with('success', 'Transaksi berhasil dihapus.');
+    }
+
+
+    public function nota($id)
+    {
+        $transaction = Transaction::with('student', 'bill.billType')->findOrFail($id);
+        return view('transactions.nota', compact('transaction'));
+    }
+
+    public function notaPdf($id)
+    {
+        $transaction = Transaction::with('student', 'bill.billType')->findOrFail($id);
+        $pdf = Pdf::loadView('transactions.nota', compact('transaction'));
+        return $pdf->download('nota-transaksi-' . $transaction->id . '.pdf');
     }
 }

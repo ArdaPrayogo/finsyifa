@@ -8,8 +8,8 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('/') ? 'active' : '' }}" aria-current="page"
-                        href="/">Home</a>
+                    <a class="nav-link {{ Request::is('dashboard') || Request::is('laporan*') ? 'active' : '' }}"
+                        aria-current="page" href="/dashboard">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('siswa*') ? 'active' : '' }}" href="/siswa">Siswa</a>

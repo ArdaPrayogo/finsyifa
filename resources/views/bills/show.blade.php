@@ -63,9 +63,26 @@
 
             <a href="/tagihan" class="btn btn-secondary">Kembali</a>
             <a href="/tagihan/{{ $bill->id }}/edit" class="btn btn-warning">Edit</a>
+            @php
+                $totalPaid = $bill->transactions->sum('amount_paid');
+                $sisa = $bill->amount - $totalPaid;
+            @endphp
+
             @if ($sisa > 0)
                 <a href="/tagihan/{{ $bill->id }}/bayar" class="btn btn-primary">Bayar Tagihan</a>
+            @else
+                @php
+                    $latestTransaction = $bill->transactions->sortByDesc('payment_date')->first();
+                @endphp
+                @if ($latestTransaction)
+                    <a href="{{ route('transaksi.nota', $latestTransaction->id) }}" class="btn btn-outline-secondary"
+                        target="_blank">Lihat
+                        Nota</a>
+                    <a href="{{ route('transaksi.nota.pdf', $latestTransaction->id) }}" class="btn btn-outline-primary"
+                        target="_blank">Download PDF</a>
+                @endif
             @endif
+
         </div>
     </div>
 @endsection
