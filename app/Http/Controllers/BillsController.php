@@ -31,23 +31,75 @@ class BillsController extends Controller
     {
         return view('bills.create', [
             'students' => Student::all(),
-            'billTypes' => Bill_type::all(),
+            'billTypes' => Bill_type::where('is_monthly', false)->get(),
         ]);
+    }
+    public function massal()
+    {
+        return view('bills.createmassal', [
+            'students' => Student::all(),
+            'billTypes' => Bill_type::where('is_monthly', false)->get(),
+        ]);
+    }
+
+    public function storeMassal(Request $request)
+    {
+        $request->validate([
+            'student_ids'   => 'required|array',
+            'student_ids.*' => 'exists:students,id',
+            'bill_type_ids' => 'required|array',
+            'bill_type_ids.*' => 'exists:bill_types,id',
+            'due_date'      => 'required|date',
+        ]);
+
+        $studentIds = $request->student_ids;
+        $billTypeIds = $request->bill_type_ids;
+        $dueDate = $request->due_date;
+
+        foreach ($studentIds as $studentId) {
+            foreach ($billTypeIds as $billTypeId) {
+                $billType = Bill_type::findOrFail($billTypeId);
+
+                Bill::create([
+                    'student_id'   => $studentId,
+                    'bill_type_id' => $billTypeId,
+                    'amount'       => $billType->default_amount,
+                    'due_date'     => $dueDate,
+                    'status'       => 'unpaid',
+                ]);
+            }
+        }
+
+        return redirect('/tagihan')->with('success', 'Tagihan massal berhasil ditambahkan!');
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'student_id'   => 'required|exists:students,id',
             'bill_type_id' => 'required|exists:bill_types,id',
-            'amount'       => 'required|numeric|min:0',
             'due_date'     => 'required|date',
             'status'       => 'required|in:unpaid,partial,paid',
+            'amount'       => 'nullable|numeric|min:0',
         ]);
 
-        Bill::create($validated);
-        return redirect('/tagihan')->with('success', 'Tagihan berhasil ditambahkan.');
+        $billType = Bill_type::findOrFail($request->bill_type_id);
+
+        // Gunakan amount dari input jika ada, jika tidak pakai default_amount
+        $amount = $request->filled('amount') ? $request->amount : $billType->default_amount;
+
+        Bill::create([
+            'student_id'   => $request->student_id,
+            'bill_type_id' => $request->bill_type_id,
+            'amount'       => $amount,
+            'due_date'     => $request->due_date,
+            'status'       => $request->status,
+        ]);
+
+        return redirect('/tagihan')->with('success', 'Tagihan berhasil ditambahkan!');
     }
+
+
 
     public function edit($id)
     {

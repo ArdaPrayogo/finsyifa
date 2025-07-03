@@ -31,14 +31,8 @@
             <input type="date" class="form-control" name="due_date">
         </div>
 
-        <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select name="status" class="form-select">
-                <option value="unpaid">Belum Lunas</option>
-                <option value="partial">Sebagian</option>
-                <option value="paid">Lunas</option>
-            </select>
-        </div>
+        <input type="hidden" name="status" value="unpaid">
+
 
         <button class="btn btn-dark" type="submit">Simpan</button>
         <a href="/tagihan" class="btn btn-secondary">Batal</a>

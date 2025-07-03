@@ -13,4 +13,6 @@ Route::get('/', function () {
 Route::resource('/siswa', StudentsController::class);
 Route::resource('/daftar_tagihan', BillTypesController::class);
 Route::resource('/tagihan', BillsController::class);
+Route::get('/massal', [BillsController::class, 'massal']);
+Route::post('/massal', [BillsController::class, 'storemassal']);
 Route::resource('/transaksi', TransactionsController::class);

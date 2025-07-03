@@ -21,7 +21,22 @@
 
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Tagihan</h1>
-        <a href="/tagihan/create" class="btn btn-outline-primary">Tambah tagihan</a>
+        <div class="d-flex">
+            <div class="dropdown mx-3 mb-3">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    Tambah Tagihan
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="/tagihan/create">Tambah tagihan satuan</a></li>
+                    <li><a class="dropdown-item" href="/massal">Tambah tagihan massal</a></li>
+                </ul>
+            </div>
+            <div>
+                <a href="/bulanan" class="btn btn-outline-success">Tambah tagihan bulanan</a>
+            </div>
+        </div>
+
 
     </div>
 
