@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bill;
-use App\Models\Bill_type;
 use App\Models\bills;
 use App\Models\Student;
+use App\Models\Bill_type;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 
 class BillsController extends Controller
@@ -133,5 +134,36 @@ class BillsController extends Controller
         $bill->delete();
 
         return redirect('/tagihan')->with('deleted', 'Tagihan berhasil dihapus.');
+    }
+
+    public function formPembayaran($id)
+    {
+        $bill = Bill::with('student', 'transactions')->findOrFail($id);
+        $sisa = $bill->amount - $bill->transactions->sum('amount_paid');
+        return view('bills.bayar', compact('bill', 'sisa'));
+    }
+
+    public function prosesPembayaran(Request $request, $id)
+    {
+        $bill = Bill::with('transactions')->findOrFail($id);
+        $sisa = $bill->amount - $bill->transactions->sum('amount_paid');
+
+        $validated = $request->validate([
+            'payment_date' => 'required|date',
+            'amount_paid' => "required|numeric|min:1|max:$sisa",
+            'note' => 'nullable|string',
+        ]);
+
+        $validated['bill_id'] = $bill->id;
+        $validated['student_id'] = $bill->student_id;
+
+        Transaction::create($validated);
+
+        // Update status
+        $totalPaid = $bill->transactions->sum('amount_paid') + $validated['amount_paid'];
+        $bill->status = $totalPaid >= $bill->amount ? 'paid' : 'partial';
+        $bill->save();
+
+        return redirect('/tagihan/' . $bill->id)->with('success', 'Pembayaran berhasil dilakukan.');
     }
 }

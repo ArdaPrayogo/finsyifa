@@ -26,10 +26,14 @@ class TransactionsController extends Controller
     public function create()
     {
         $students = Student::all();
-        $bills = Bill::with('student', 'billType')->get(); // relasi ke siswa & jenis tagihan
+
+        // Ambil hanya tagihan yang belum lunas atau sebagian
+        $bills = Bill::with('student', 'billType')
+            ->whereIn('status', ['unpaid', 'partial'])
+            ->get();
+
         return view('transactions.create', compact('students', 'bills'));
     }
-
 
 
     /**
@@ -38,17 +42,36 @@ class TransactionsController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'bill_id' => 'required|exists:bills,id',
-            'amount_paid' => 'required|numeric|min:1',
+            'student_id'   => 'required|exists:students,id',
+            'bill_id'      => 'required|exists:bills,id',
+            'amount_paid'  => 'required|numeric|min:1',
             'payment_date' => 'required|date',
-            'note' => 'nullable|string',
+            'note'         => 'nullable|string',
         ]);
 
-        Transaction::create($validated);
+        // Simpan transaksi
+        $transaction = Transaction::create($validated);
+
+        // Ambil tagihan terkait
+        $bill = Bill::find($validated['bill_id']);
+
+        // Hitung total pembayaran sejauh ini
+        $totalPaid = Transaction::where('bill_id', $bill->id)->sum('amount_paid');
+
+        // Update status tagihan
+        if ($totalPaid >= $bill->amount) {
+            $bill->status = 'paid';
+        } elseif ($totalPaid > 0) {
+            $bill->status = 'partial';
+        } else {
+            $bill->status = 'unpaid';
+        }
+
+        $bill->save();
 
         return redirect('/transaksi')->with('success', 'Transaksi berhasil ditambahkan.');
     }
+
 
     /**
      * Display the specified resource.

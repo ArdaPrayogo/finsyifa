@@ -36,8 +36,6 @@
                 <a href="/tagihan-bulanan/create" class="btn btn-outline-success">Tambah tagihan bulanan</a>
             </div>
         </div>
-
-
     </div>
 
     <table id="myTable" class="table table-bordered table-striped">
@@ -54,10 +52,21 @@
         </thead>
         <tbody>
             @foreach ($bills as $i => $bill)
+                @php
+                    $typeName = $bill->billType->name ?? '-';
+                    $isMonthly = $bill->month && $bill->year;
+                    $periode = $isMonthly
+                        ? ' (' .
+                            \Carbon\Carbon::createFromDate($bill->year, $bill->month, 1)->translatedFormat('F Y') .
+                            ')'
+                        : '';
+                    $tagihanLabel = $isMonthly ? ' - Tagihan Bulanan' : ' - Tagihan Satuan';
+                    $fullName = $typeName . $periode . $tagihanLabel;
+                @endphp
                 <tr>
                     <td>{{ $i + 1 }}</td>
                     <td>{{ $bill->student->name }}</td>
-                    <td>{{ $bill->billType->name }}</td>
+                    <td>{{ $fullName }}</td>
                     <td>Rp {{ number_format($bill->amount, 0, ',', '.') }}</td>
                     <td>{{ \Carbon\Carbon::parse($bill->due_date)->translatedFormat('d F Y') }}</td>
                     <td>

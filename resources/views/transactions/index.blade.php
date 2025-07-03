@@ -38,10 +38,22 @@
         </thead>
         <tbody>
             @foreach ($transactions as $i => $trx)
+                @php
+                    $bill = $trx->bill;
+                    $billTypeName = $bill->billType->name ?? '-';
+                    $isMonthly = $bill->month && $bill->year;
+                    $periode = $isMonthly
+                        ? ' (' .
+                            \Carbon\Carbon::createFromDate($bill->year, $bill->month, 1)->translatedFormat('F Y') .
+                            ')'
+                        : '';
+                    $jenisTagihan = $isMonthly ? 'Tagihan Bulanan' : 'Tagihan Satuan';
+                    $namaTagihanLengkap = $billTypeName . $periode . ' - ' . $jenisTagihan;
+                @endphp
                 <tr>
                     <td>{{ $i + 1 }}</td>
                     <td>{{ $trx->student->name }}</td>
-                    <td>{{ $trx->bill->billType->name }}</td>
+                    <td>{{ $namaTagihanLengkap }}</td>
                     <td>Rp {{ number_format($trx->amount_paid, 0, ',', '.') }}</td>
                     <td>{{ \Carbon\Carbon::parse($trx->payment_date)->translatedFormat('d F Y') }}</td>
                     <td>{{ $trx->note ?? '-' }}</td>

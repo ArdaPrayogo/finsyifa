@@ -15,7 +15,28 @@
                 </tr>
                 <tr>
                     <th>Jumlah Pembayaran</th>
-                    <td>Rp {{ number_format($transaction->amount, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($transaction->amount_paid, 0, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <th>Total Tagihan</th>
+                    <td>Rp {{ number_format($transaction->bill->amount_paid, 0, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <th>Total Telah Dibayar</th>
+                    <td>
+                        Rp
+                        {{ number_format($transaction->bill->transactions->sum('amount_paid'), 0, ',', '.') }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>Kekurangan</th>
+                    <td>
+                        @php
+                            $kekurangan =
+                                $transaction->bill->amount - $transaction->bill->transactions->sum('amount_paid');
+                        @endphp
+                        Rp {{ number_format(max($kekurangan, 0), 0, ',', '.') }}
+                    </td>
                 </tr>
                 <tr>
                     <th>Tanggal Pembayaran</th>
@@ -27,7 +48,7 @@
                 </tr>
             </table>
             <a href="/transaksi" class="btn btn-secondary">Kembali</a>
-            <a href="/transaksi/{{ $transaction->id }}/edit" class="btn btn-secondary">edit</a>
+            <a href="/transaksi/{{ $transaction->id }}/edit" class="btn btn-secondary">Edit</a>
         </div>
     </div>
 @endsection
