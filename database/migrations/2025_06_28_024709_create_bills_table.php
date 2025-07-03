@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('bill_type_id')->nullable()->constrained('bill_types')->nullOnDelete();
             $table->decimal('amount', 10, 2)->nullable(); // bisa dikosongkan dulu
             $table->date('due_date')->nullable();
+            $table->unsignedTinyInteger('month')->nullable(); // 1–12 untuk Januari–Desember
+            $table->year('year')->nullable();                 // Contoh: 2025
             $table->enum('status', ['unpaid', 'partial', 'paid'])->default('unpaid');
             $table->timestamps();
         });

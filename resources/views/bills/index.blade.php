@@ -33,7 +33,7 @@
                 </ul>
             </div>
             <div>
-                <a href="/bulanan" class="btn btn-outline-success">Tambah tagihan bulanan</a>
+                <a href="/tagihan-bulanan/create" class="btn btn-outline-success">Tambah tagihan bulanan</a>
             </div>
         </div>
 
