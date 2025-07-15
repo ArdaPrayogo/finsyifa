@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('amount_paid', 10, 2);
             $table->date('payment_date');
             $table->text('note')->nullable();
+            $table->string('signature_path')->nullable();
             $table->timestamps();
         });
     }

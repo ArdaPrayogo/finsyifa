@@ -59,7 +59,22 @@
                         <td>{{ DateTime::createFromFormat('!m', $bill->month)->format('F') }} {{ $bill->year }}</td>
                     </tr>
                 @endif
+
+                @php
+                    $latestTransaction = $bill->transactions->sortByDesc('payment_date')->first();
+                @endphp
+
+                @if ($latestTransaction && $latestTransaction->signature_path)
+                    <tr>
+                        <th>Tanda Tangan Bendahara</th>
+                        <td>
+                            <img src="{{ asset('storage/' . $latestTransaction->signature_path) }}" alt="Tanda Tangan"
+                                style="border:1px solid #ccc; max-width:400px;">
+                        </td>
+                    </tr>
+                @endif
             </table>
+
 
             <a href="/tagihan" class="btn btn-secondary">Kembali</a>
             <a href="/tagihan/{{ $bill->id }}/edit" class="btn btn-warning">Edit</a>

@@ -8,6 +8,8 @@ use App\Models\Student;
 use App\Models\Bill_type;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class BillsController extends Controller
 {
@@ -143,6 +145,7 @@ class BillsController extends Controller
         return view('bills.bayar', compact('bill', 'sisa'));
     }
 
+
     public function prosesPembayaran(Request $request, $id)
     {
         $bill = Bill::with('transactions')->findOrFail($id);
@@ -150,17 +153,41 @@ class BillsController extends Controller
 
         $validated = $request->validate([
             'payment_date' => 'required|date',
-            'amount_paid' => "required|numeric|min:1|max:$sisa",
-            'note' => 'nullable|string',
+            'amount_paid'  => "required|numeric|min:1|max:$sisa",
+            'note'         => 'nullable|string',
+            'signature'    => 'nullable|string', // base64 image
         ]);
 
         $validated['bill_id'] = $bill->id;
         $validated['student_id'] = $bill->student_id;
 
+        // Simpan tanda tangan jika ada
+        if (!empty($validated['signature'])) {
+            $image = $validated['signature'];
+
+            // Hapus prefix base64
+            $image = str_replace('data:image/png;base64,', '', $image);
+            $image = str_replace(' ', '+', $image);
+            $imageData = base64_decode($image);
+
+            // Nama file
+            $filename = 'signature_' . Str::random(10) . '.png';
+            $path = 'signatures/' . $filename;
+
+            // Simpan ke storage/public/signatures
+            Storage::disk('public')->put($path, $imageData);
+
+            // Tambahkan path ke data
+            $validated['signature_path'] = $path;
+        }
+
+        // Simpan transaksi
         Transaction::create($validated);
 
-        // Update status
+        // Hitung ulang total dibayar termasuk transaksi baru
         $totalPaid = $bill->transactions->sum('amount_paid') + $validated['amount_paid'];
+
+        // Update status tagihan
         $bill->status = $totalPaid >= $bill->amount ? 'paid' : 'partial';
         $bill->save();
 

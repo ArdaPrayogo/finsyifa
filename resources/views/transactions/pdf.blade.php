@@ -113,7 +113,8 @@
         @if ($transaction->signature_path)
             <div class="ttd">
                 <p>TTD Bendahara</p>
-                <img src="{{ asset('storage/' . $transaction->signature_path) }}" alt="Tanda Tangan">
+                <img src="{{ public_path('storage/' . $transaction->signature_path) }}" alt="Tanda Tangan"
+                    style="max-height: 100px;">
             </div>
         @endif
 

@@ -8,6 +8,8 @@ use App\Models\Transaction;
 use App\Models\transactions;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class TransactionsController extends Controller
 {
@@ -40,6 +42,7 @@ class TransactionsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -48,18 +51,41 @@ class TransactionsController extends Controller
             'amount_paid'  => 'required|numeric|min:1',
             'payment_date' => 'required|date',
             'note'         => 'nullable|string',
+            'signature'    => 'nullable|string', // base64 image
         ]);
 
+        $data = $validated;
+        $data['signature_path'] = null;
+
+        // Simpan tanda tangan jika ada
+        if (!empty($validated['signature'])) {
+            try {
+                $imageBase64 = $validated['signature'];
+                $imageBase64 = str_replace('data:image/png;base64,', '', $imageBase64);
+                $imageBase64 = str_replace(' ', '+', $imageBase64);
+                $imageData = base64_decode($imageBase64);
+
+                if ($imageData === false) {
+                    return back()->withErrors(['signature' => 'Tanda tangan tidak valid.']);
+                }
+
+                $filename = 'signature_' . Str::random(10) . '.png';
+                $path = 'signatures/' . $filename;
+
+                Storage::disk('public')->put($path, $imageData);
+                $data['signature_path'] = $path;
+            } catch (\Exception $e) {
+                return back()->withErrors(['signature' => 'Gagal menyimpan tanda tangan.']);
+            }
+        }
+
         // Simpan transaksi
-        $transaction = Transaction::create($validated);
-
-        // Ambil tagihan terkait
-        $bill = Bill::find($validated['bill_id']);
-
-        // Hitung total pembayaran sejauh ini
-        $totalPaid = Transaction::where('bill_id', $bill->id)->sum('amount_paid');
+        $transaction = Transaction::create($data);
 
         // Update status tagihan
+        $bill = Bill::find($validated['bill_id']);
+        $totalPaid = Transaction::where('bill_id', $bill->id)->sum('amount_paid');
+
         if ($totalPaid >= $bill->amount) {
             $bill->status = 'paid';
         } elseif ($totalPaid > 0) {
@@ -72,6 +98,7 @@ class TransactionsController extends Controller
 
         return redirect('/transaksi')->with('success', 'Transaksi berhasil ditambahkan.');
     }
+
 
 
     /**
@@ -134,7 +161,9 @@ class TransactionsController extends Controller
     public function notaPdf($id)
     {
         $transaction = Transaction::with('student', 'bill.billType')->findOrFail($id);
-        $pdf = Pdf::loadView('transactions.nota', compact('transaction'));
-        return $pdf->download('nota-transaksi-' . $transaction->id . '.pdf');
+        $pdf = Pdf::loadView('transactions.pdf', compact('transaction'));
+        // dd(public_path('storage/' . $transaction->signature_path));
+
+        return $pdf->stream('nota-transaksi-' . $transaction->id . '.pdf');
     }
 }

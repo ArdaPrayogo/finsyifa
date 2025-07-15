@@ -57,6 +57,15 @@
                     <th>Catatan</th>
                     <td>{{ $transaction->note ?? '-' }}</td>
                 </tr>
+                @if ($transaction->signature_path)
+                    <tr>
+                        <th>Tanda Tangan Bendahara</th>
+                        <td>
+                            <img src="{{ asset('storage/' . $transaction->signature_path) }}" alt="Tanda Tangan"
+                                style="border:1px solid #ccc; max-width:400px;">
+                        </td>
+                    </tr>
+                @endif
             </table>
             <a href="/transaksi" class="btn btn-secondary">Kembali</a>
             <a href="/transaksi/{{ $transaction->id }}/edit" class="btn btn-secondary">Edit</a>
