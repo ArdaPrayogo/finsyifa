@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/img/logo.ico" type="image/x-icon">
     <title>Nota Transaksi</title>
     <style>
         body {
@@ -16,13 +18,20 @@
             margin: auto;
         }
 
-        h2 {
+        .kop-surat {
+            width: 100%;
+            margin-bottom: 0px;
+        }
+
+        h3 {
             text-align: center;
+            margin: 0px
         }
 
         table {
             width: 100%;
             margin-top: 20px;
+            margin-left: 10px;
             border-collapse: collapse;
         }
 
@@ -59,12 +68,15 @@
             margin-top: 10px;
         }
     </style>
+
 </head>
 
 <body>
     <div class="container">
-        <h2>Nota Transaksi Pembayaran</h2>
-        <div class="line"></div>
+        <!-- Gambar Kop Surat -->
+        <img src="{{ asset('img/kop.png') }}" alt="Kop Surat" class="kop-surat">
+
+        <h3>Nota Transaksi Pembayaran</h3>
         <table>
             <tr>
                 <td>Nama Siswa</td>
@@ -114,6 +126,9 @@
             <div class="ttd">
                 <p>TTD Bendahara</p>
                 <img src="{{ asset('storage/' . $transaction->signature_path) }}" alt="Tanda Tangan">
+                <div class="text-end mb-2">
+                    <small><strong>( {{ auth()->user()->name }} )</strong></small>
+                </div>
             </div>
         @endif
 
